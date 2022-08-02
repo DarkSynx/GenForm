@@ -2,8 +2,8 @@
 generateur de formulaire
 
 
-use Modules_formulaire_input as INPUT;
-use Modules_formulaire as FORMULAIRE;
+        use Modules_formulaire_input as INPUT;
+        use Modules_formulaire as FORMULAIRE;
         var_dump(
             FORMULAIRE::defini('formulaire_test')
                 ->elements(
