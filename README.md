@@ -64,8 +64,7 @@ E X E M P L E II
 
 
 
-
------------------------------>
+----------------------
 array (size=2)
   0 => string '<form action="formulaire_test" post="post">
 
