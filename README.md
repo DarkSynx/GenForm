@@ -1,6 +1,8 @@
 # GenForm
 generateur de formulaire
 
+----------------------
+E X E M P L E I
 
         use Modules_formulaire_input as INPUT;
         use Modules_formulaire as FORMULAIRE;
@@ -23,9 +25,27 @@ generateur de formulaire
                 )
                 ->generer()
         );
-
 ----------------------
 E X E M P L E II
+
+        var_dump(
+
+            SELECT::defini(
+                id: 'id_input_2',
+                class: 'classtest i121 l3 o1 ',
+                name: 'nametest2',
+                autofocus: true,
+                multiple: true,
+                required: true,
+            )
+                ->option('chien', 'dog')
+                ->option('chat', 'cat')
+                ->finaliser()
+
+        );
+
+----------------------
+E X E M P L E III
 
         var_dump(
             FORMULAIRE::defini('formulaire_test')
