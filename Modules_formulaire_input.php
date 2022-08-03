@@ -3,6 +3,7 @@
 namespace Eukaruon\modules;
 
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -116,7 +117,7 @@ class Modules_formulaire_input
         qui le prennent en charge. */
         'date' => [
             'nettoyage' => ['/[^0-9-]/', self::FONCTION_PREGREPLACE],
-            'validation' => ['checkdate', self::FONCTION_PHP],
+            'validation' => ['/\d{4}-\d{2}-\d{2}/', self::FONCTION_PREGMATCH],
             'argument' => [
                 'value' => 'yyyy-mm-dd',
                 'max' => 'yyyy-mm-dd',
@@ -129,7 +130,7 @@ class Modules_formulaire_input
         charge */
         'datetime-local' => [
             'nettoyage' => ['/[^0-9T:-]/', self::FONCTION_PREGREPLACE],
-            'validation' => ['validation_strtotime', self::FONCTION_CLASS],
+            'validation' => ['/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/', self::FONCTION_PREGMATCH],
             'argument' => [
                 'value' => 'yyyy-MM-ddThh:mm',
                 'max' => 'yyyy-MM-ddThh:mm',
@@ -180,7 +181,7 @@ class Modules_formulaire_input
         l'attribut alt doit être défini avec le texte alternatif si l'image est absente.*/
         'image' => [
             'nettoyage' => [],
-            'validation' => ['validation_image', self::FONCTION_CLASS],
+            'validation' => [],
             'argument' => [
 
                 // L'attribut src est utilisé afin d'indiquer le chemin vers l'image à afficher sur le bouton.
@@ -338,7 +339,7 @@ class Modules_formulaire_input
         /* Un contrôle pour saisir une valeur temporelle sans fuseau horaire. */
         'time' => [
             'nettoyage' => ['/[^0-9:]/', self::FONCTION_PREGREPLACE],
-            'validation' => ['validation_strtotime', self::FONCTION_CLASS],
+            'validation' => ['/\d{2}:\d{2}/', self::FONCTION_PREGMATCH],
             'argument' => [
                 'value' => 'hh:mm',
                 'max' => 'hh:mm',
@@ -362,7 +363,7 @@ class Modules_formulaire_input
         (sans indication de fuseau horaire). */
         'week' => [
             'nettoyage' => ['/[^0-9W-]/', self::FONCTION_PREGREPLACE],
-            'validation' => ['validation_strtotime', self::FONCTION_CLASS],
+            'validation' => ['/\d{4}-W\d{2}/', self::FONCTION_PREGMATCH],
             'argument' => [
                 'value' => 'yyyy-Www',
                 'max' => 'yyyy-Www',
@@ -385,11 +386,16 @@ class Modules_formulaire_input
     }
 
     /**
-     * @param $type
+     * @param string $type
+     * @param string|null $mode
+     * @param string $id
+     * @param string $class
+     * @param string $name
      * @return array
      * @throws Exception
      */
-    private static function corp(string $type, string|null $mode, string $id = '', string $class = '', string $name = '')
+    #[ArrayShape([0 => "string", 1 => "mixed", 2 => "string", 'name' => "string"])]
+    private static function corp(string $type, string|null $mode, string $id = '', string $class = '', string $name = ''): array
     {
 
         $gen_id_class_name = '';
@@ -413,10 +419,10 @@ class Modules_formulaire_input
      * @param $type
      * @param $mode
      * @param $name
-     * @return mixed|string
+     * @return string
      * @throws Exception
      */
-    public static function nettoyage($test, $type, $mode, $name)
+    public static function nettoyage($test, $type, $mode, $name): string
     {
         $test .= "/* ===[ TEST DE : $name] === */" . PHP_EOL;
         if ( // on detecte si nettoyage est vide
@@ -427,16 +433,11 @@ class Modules_formulaire_input
             $nettoyage_filtre = self::TYPE[$type]['nettoyage'][0];
             $nettoyage_action = self::TYPE[$type]['nettoyage'][1];
 
-            if ($nettoyage_action == self::MODE_TYPE && !is_null($mode)) { // indique que c'est un type différent int float
-                if (is_null($mode)) {
-                    $nettoyage_filtre_2 = $nettoyage_filtre;
-                    $nettoyage_filtre = $nettoyage_filtre_2['int'][0];
-                    $nettoyage_action = $nettoyage_filtre_2['int'][1];
-                } else {
-                    $nettoyage_filtre_2 = $nettoyage_filtre;
+            if ($nettoyage_action == self::MODE_TYPE ) { // indique que c'est un type différent int float
+                $nettoyage_filtre_2 = $nettoyage_filtre;
+                if (is_null($mode)) $mode = 'int';
                     $nettoyage_filtre = $nettoyage_filtre_2[$mode][0];
                     $nettoyage_action = $nettoyage_filtre_2[$mode][1];
-                }
             }
 
             switch ($nettoyage_action) {
@@ -475,7 +476,7 @@ class Modules_formulaire_input
      * @return string
      * @throws Exception
      */
-    public static function validation($test, $type, $mode, $name)
+    public static function validation($test, $type, $mode, $name): string
     {
         $test .= PHP_EOL;
         if ( // on detecte si validation est vide
@@ -526,29 +527,38 @@ class Modules_formulaire_input
 
 
     /**
-     * Exception n'est pas un validateur mais vas hash le contenu
-     * celui-ci peut contenir des hack ça ne posera aucun probléme
-     *
+     * @param $name
+     * @param bool $test_interne
+     * @param string $option
+     * @return string
      */
-    private static function passwors_hash($name, bool $test_interne = false, string $option = '')
+    private static function passwors_hash($name, bool $test_interne = false, string $option = ''): string
     {
         return "\$recolte['$name'][0] = hash('sha512', \$_POST['$name']);";
     }
 
+
     /**
-     *
+     * @param $name
+     * @param bool $test_interne
+     * @param string $option
+     * @return false|int|string
      */
-    private static function validation_strtotime($name, bool $test_interne = false, string $option = '')
+    private static function validation_strtotime($name, bool $test_interne = false, string $option = ''): bool|int|string
     {
         // === false
         if ($test_interne) return strtotime($name);
         return "\$recolte['$name'][0] = strtotime(\$_POST['$name']);";
     }
 
+
     /**
-     *
+     * @param $name
+     * @param bool $test_interne
+     * @param string $option
+     * @return false|int|string
      */
-    private static function validation_tel($name, bool $test_interne = false, string $option = '')
+    private static function validation_tel($name, bool $test_interne = false, string $option = ''): bool|int|string
     {
         //+33 7 17 41 83 03
         if ($test_interne) return preg_match('/\+\d{11}|\d{10}/', $name);
@@ -561,10 +571,14 @@ class Modules_formulaire_input
     // V A L I D A T I O N - S P E C I A L
     // ------------------------------------
 
+
     /**
-     *
+     * @param $name
+     * @param bool $test_interne
+     * @param string|null $option
+     * @return string
      */
-    private static function validation_fichier($name, bool $test_interne = false, string|null $option = null)
+    private static function validation_fichier($name, bool $test_interne = false, string|null $option = null): string
     {
         if (is_null($option)) $option = 'upload';
         if ($option[0] == '[' && $option[-1] == ']') {
@@ -636,19 +650,17 @@ class Modules_formulaire_input
 ";
     }
 
-    /**
-     *
-     */
-    private static function validation_image($name, bool $test_interne = false, string $option = '')
-    {
-        return '' . PHP_EOL;
-    }
+
+
     //--------------------------------------------------
 
 
     /**
-     * @param $type : selectionner le type
-     * @param null $mode : le mode possible exemple type:number mode:int ou mode:float
+     * @param string $type : selectionner le type
+     * @param string|null $option
+     * @param string $id
+     * @param string $class
+     * @param string $name
      * @return static
      * @throws Exception
      */
@@ -665,7 +677,7 @@ class Modules_formulaire_input
      * @param $fonction
      * @return static
      */
-    public static function queue($fonction): static
+    #[Pure] public static function queue($fonction): static
     {
         return new static($fonction);
     }
@@ -723,9 +735,13 @@ class Modules_formulaire_input
      * @param $argument
      * @param $valeur
      * @param $preparation
+     * @param $mode
+     * @param $test_specifique
+     * @param $maxmin_test
      * @return array
      * @throws Exception
      */
+    #[ArrayShape([0 => "string", 1 => "mixed", 2 => "string", 'name' => "mixed"])]
     public function element($argument, $valeur, $preparation, $mode, $test_specifique, $maxmin_test): array
     {
         // vérification valeur par type
@@ -822,6 +838,11 @@ class Modules_formulaire_input
         return ["{$preparation[0]} $argument=\"$valeur\"", $preparation[1], $test, 'name' => $preparation['name']];
     }
 
+    /**
+     * @param $preparation
+     * @param $mode
+     * @return array
+     */
     public static function validation_spec($preparation, $mode): array
     {
         // $validation_filtre = self::TYPE[$type]['validation'][0];
@@ -843,8 +864,7 @@ class Modules_formulaire_input
     /**
      * @return array
      */
-    public
-    function finaliser(): array
+    public function finaliser(): array
 
     {
         $this->preparation[0] .= '>';

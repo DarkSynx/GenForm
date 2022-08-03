@@ -4,6 +4,9 @@ namespace Eukaruon\modules;
 
 use JetBrains\PhpStorm\Pure;
 
+/**
+ *
+ */
 class Modules_formulaire
 {
     /**
@@ -12,23 +15,36 @@ class Modules_formulaire
     protected array $code = ['', '<?php '];
 
 
+    /**
+     * @param $code
+     */
     public function __construct($code)
     {
         $this->code = $code;
     }
 
-    #[Pure] public static function defini($action, $method = 'post')
+    /**
+     * @param $action
+     * @param string $method
+     * @return static
+     */
+    #[Pure] public static function defini($action, string $method = 'post'): static
     {
         return new static(self::identite_formulaire($action, $method));
     }
 
-    #[Pure] public static function gestion_element($element)
+    /**
+     * @param $element
+     * @return static
+     */
+    #[Pure] public static function gestion_element($element): static
     {
         return new static($element);
     }
 
     /**
-     * @param $type
+     * @param $action
+     * @param $method
      * @return array
      */
     private static function identite_formulaire($action, $method): array
@@ -37,7 +53,11 @@ class Modules_formulaire
     }
 
 
-    public function elements(...$tableau)
+    /**
+     * @param ...$tableau
+     * @return $this
+     */
+    public function elements(...$tableau): static
     {
         $tableau_fusionner = [$this->code[0],$this->code[1]];
         foreach ($tableau as $valeur) {
@@ -51,9 +71,7 @@ class Modules_formulaire
     }
 
     /**
-     * @param $argument
-     * @param $valeur
-     * @param $preparation
+     * @param $tableau
      * @return array
      */
     public function element($tableau): array
@@ -62,7 +80,10 @@ class Modules_formulaire
     }
 
 
-    public function generer()
+    /**
+     * @return array
+     */
+    public function generer(): array
     {
         $this->code[0] .= PHP_EOL . '</form>';
         return [
