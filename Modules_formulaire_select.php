@@ -39,15 +39,14 @@ class Modules_formulaire_select
                                           string|null $class = null,
                                           string|null $name = null,
                                           string|null $autocomplete = null,
-                                          string|null $autofocus = null,
-                                          string|null $disabled = null,
+                                          bool|null   $autofocus = null,
+                                          bool|null   $disabled = null,
                                           string|null $form = null,
-                                          string|null $multiple = null,
-                                          string|null $required = null,
-                                          string|null $size = null
-    ): static
+                                          bool|null   $multiple = null,
+                                          bool|null   $required = null,
+                                          string|null $size = null): static
     {
-        return new static(self::corp($id, $class, $name));
+        return new static(self::corp($id, $class, $name, $autocomplete, $autofocus, $disabled, $form, $multiple, $required, $size));
     }
 
 
@@ -68,11 +67,11 @@ class Modules_formulaire_select
                                  string|null $class = null,
                                  string|null $name = null,
                                  string|null $autocomplete = null,
-                                 string|null $autofocus = null,
-                                 string|null $disabled = null,
+                                 bool|null   $autofocus = null,
+                                 bool|null   $disabled = null,
                                  string|null $form = null,
-                                 string|null $multiple = null,
-                                 string|null $required = null,
+                                 bool|null   $multiple = null,
+                                 bool|null   $required = null,
                                  string|null $size = null): array
     {
         $gen_id_class_name = '';
@@ -80,11 +79,11 @@ class Modules_formulaire_select
         if (strlen($class) > 0) $gen_id_class_name .= " class=\"$class\"";
         if (strlen($name) > 0) $gen_id_class_name .= " name=\"$name\"";
         if (strlen($autocomplete) > 0) $gen_id_class_name .= " autocomplete=\"$autocomplete\"";
-        if (strlen($autofocus) > 0) $gen_id_class_name .= " autofocus";
-        if (strlen($disabled) > 0) $gen_id_class_name .= " disabled";
+        if ($autofocus) $gen_id_class_name .= " autofocus";
+        if ($disabled) $gen_id_class_name .= " disabled";
         if (strlen($form) > 0) $gen_id_class_name .= " form=\"$form\"";
-        if (strlen($multiple) > 0) $gen_id_class_name .= " multiple";
-        if (strlen($required) > 0) $gen_id_class_name .= " required";
+        if ($multiple) $gen_id_class_name .= " multiple";
+        if ($required) $gen_id_class_name .= " required";
         if (strlen($size) > 0) $gen_id_class_name .= " size=\"$size\"";
 
 
@@ -111,7 +110,7 @@ class Modules_formulaire_select
         return static::queue(
             call_user_func_array(
                 [$this, 'element'],
-                [$valeur,$label, $this->preparation])
+                [$valeur, $label, $this->preparation])
         );
     }
 
