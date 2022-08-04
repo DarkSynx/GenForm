@@ -2,7 +2,7 @@
 generateur de formulaire
 
 ----------------------
-E X E M P L E I
+E X E M P L E   I
 
         use Modules_formulaire_input as INPUT;
         use Modules_formulaire as FORMULAIRE;
@@ -26,7 +26,7 @@ E X E M P L E I
                 ->generer()
         );
 ----------------------
-E X E M P L E II
+E X E M P L E   II
 
         var_dump(
 
@@ -45,7 +45,25 @@ E X E M P L E II
         );
 
 ----------------------
-E X E M P L E III
+E X E M P L E   III
+
+        var_dump(
+
+            TEXTAREA::defini(
+                id: 'id_input_2',
+                class: 'classtest i121 l3 o1 ',
+                name: 'nametest2',
+                filtre: 'FILTER_SANITIZE_ADD_SLASHES|FILTER_SANITIZE_ENCODED',
+                encaps_b64: true
+            )
+                ->contenu('texte1 bla bla bla bla1')
+                ->contenu('texte2 bla bla bla bla2')
+                ->finaliser()
+
+        );
+
+----------------------
+E X E M P L E   IV
 
         var_dump(
             FORMULAIRE::defini('formulaire_test')
