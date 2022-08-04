@@ -422,7 +422,7 @@ class Modules_formulaire_input
      * @return string
      * @throws Exception
      */
-    public static function nettoyage($test, $type, $mode, $name): string
+    private static function nettoyage($test, $type, $mode, $name): string
     {
         $test .= "/* ===[ TEST DE : $name] === */" . PHP_EOL;
         if ( // on detecte si nettoyage est vide
@@ -476,7 +476,7 @@ class Modules_formulaire_input
      * @return string
      * @throws Exception
      */
-    public static function validation($test, $type, $mode, $name): string
+    private static function validation($test, $type, $mode, $name): string
     {
         $test .= PHP_EOL;
         if ( // on detecte si validation est vide
@@ -677,7 +677,7 @@ class Modules_formulaire_input
      * @param $fonction
      * @return static
      */
-    #[Pure] public static function queue($fonction): static
+    #[Pure] private static function queue($fonction): static
     {
         return new static($fonction);
     }
@@ -697,7 +697,7 @@ class Modules_formulaire_input
                 }
             }
             return static::queue(
-                ["{$this->preparation[0]} $nom=\"$valeur\"", $this->preparation[1], $this->preparation[2]]
+                ["{$this->preparation[0]} $nom=\"$valeur\"", $this->preparation[1], $this->preparation[2], 'name' => $this->name]
             );
         }
         throw new Exception(
@@ -742,7 +742,7 @@ class Modules_formulaire_input
      * @throws Exception
      */
     #[ArrayShape([0 => "string", 1 => "mixed", 2 => "string", 'name' => "mixed"])]
-    public function element($argument, $valeur, $preparation, $mode, $test_specifique, $maxmin_test): array
+    private function element($argument, $valeur, $preparation, $mode, $test_specifique, $maxmin_test): array
     {
         // vérification valeur par type
         // concaténation de test
