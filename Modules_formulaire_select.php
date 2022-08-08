@@ -104,19 +104,32 @@ class Modules_formulaire_select
 
         if (is_null($filtre)) $filtre = '/[^a-zA-Z0-1+-_.]/';
 
-        $test = "\$_POST['$name'] = preg_replace('$filtre', '', \$_POST['$name']);" . PHP_EOL;
-        $test .= "\$recolte['$name'][0] = preg_match('$filtre', \$_POST['$name']);" . PHP_EOL;
+        $test = <<<TEST
+        /* 
+         * ---=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--- 
+         * TEST : SELECT : $name
+         * ---=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--- 
+         */
+        \$recolte['$name']['type'] = 'select';
+        
+        TEST;
 
-        return ["<select$gen_id_class_name>", $test, 'name' => $name];
-    }
+        $test .= "/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */" . PHP_EOL;
+        $test .= "// Si \$_POST['$name'] existe " . PHP_EOL;
+        $test .= "if(isset(\$_POST['$name'])){" . PHP_EOL. PHP_EOL. PHP_EOL;
 
-    /**
-     * @param $fonction
-     * @return static
-     */
-    #[Pure] private static function queue($fonction): static
-    {
-        return new static($fonction);
+        $test .= "// analyse de \$_POST['$name'] " . PHP_EOL;
+        $test .= "\$recolte['$name']['avant'] = strlen(\$_POST['$name']);" . PHP_EOL;
+
+        $test .= "// nettoyage de \$_POST['$name'] " . PHP_EOL;
+        $test .= "\$_POST['$name'] = preg_replace('$filtre', '', \$_POST['$name']);" . PHP_EOL;
+        $test .= "\$recolte['$name']['resultat'] = preg_match('$filtre', \$_POST['$name']);" . PHP_EOL;
+
+        $test .= "// fin analyse de \$_POST['$name'] " . PHP_EOL;
+        $test .= "\$recolte['$name']['apres'] = strlen(\$_POST['$name']);" . PHP_EOL;
+        $test .= "\$recolte['$name']['modification'] = (\$recolte['$name']['apres'] == \$recolte['$name']['avant']);" . PHP_EOL;
+
+        return ["<select$gen_id_class_name>" . PHP_EOL, $test, 'name' => $name];
     }
 
     /**
@@ -134,6 +147,34 @@ class Modules_formulaire_select
         );
     }
 
+    /**
+     * @param $fonction
+     * @return static
+     */
+    #[Pure] private static function queue($fonction): static
+    {
+        return new static($fonction);
+    }
+
+    /**
+     * @return array
+     */
+    public function finaliser(): array
+    {
+
+        $this->preparation[0] .= '</select>';
+        return [
+            $this->preparation[0],
+            $this->preparation[1] .
+            "\$recolte['{$this->preparation['name']}']['test'] = in_array(
+                \$_POST['{$this->preparation['name']}'],
+                \$recolte['{$this->preparation['name']}']['autre']
+                );" . PHP_EOL .
+            '}' . PHP_EOL . '/* ISSET FIN -------------------- */' . PHP_EOL,
+            'select',
+            $this->preparation['name']
+        ];
+    }
 
     /**
      * @param $valeur
@@ -146,26 +187,9 @@ class Modules_formulaire_select
     {
         $this->name = $preparation['name'];
 
-        $test = $preparation[1] . "\$recolte['{$preparation['name']}']['valeur'][] = '$valeur';" . PHP_EOL;
+        $test = $preparation[1] . "\$recolte['{$preparation['name']}']['autre'][] = '$valeur';" . PHP_EOL;
 
         return ["{$preparation[0]}<option value=\"$valeur\">$label</option>" . PHP_EOL, $test, 'name' => $preparation['name']];
-    }
-
-
-    /**
-     * @return array
-     */
-    public function finaliser(): array
-    {
-        $this->preparation[0] .= PHP_EOL . '</select>';
-        return [
-            $this->preparation[0],
-            $this->preparation[1] .
-            "\$recolte['{$this->preparation['name']}']['test'] = in_array(
-                \$_POST['{$this->preparation['name']}'],
-                \$recolte['{$this->preparation['name']}']['valeur']
-                );" . PHP_EOL
-        ];
     }
 
 }

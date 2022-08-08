@@ -68,7 +68,7 @@ class Modules_formulaire_textarea
                                           string|null $spellcheck = null,
                                           string|null $wrap = null,
                                           string|null $filtre = null,
-                                          bool|null $encaps_b64 = null,
+                                          bool|null   $encaps_b64 = null,
 
     ): static
     {
@@ -119,7 +119,7 @@ class Modules_formulaire_textarea
                                  string|null $spellcheck = null,
                                  string|null $wrap = null,
                                  string|null $filtre = null,
-                                 bool|null $encaps_b64 = null,
+                                 bool|null   $encaps_b64 = null,
     ): array
     {
         $gen_id_class_name = '';
@@ -141,23 +141,30 @@ class Modules_formulaire_textarea
         if (!is_null($spellcheck)) $gen_id_class_name .= " spellcheck=\"$spellcheck\"";
         if (!is_null($wrap)) $gen_id_class_name .= " wrap=\"$wrap\"";
 
+        $test = <<<TEST
+        /* 
+         * ---=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--- 
+         * TEST : TEXTAREA : $name
+         * ---=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--- 
+         */
+        \$recolte['$name']['type'] = 'select';
+        
+        TEST;
+
+        $test .= "/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */" . PHP_EOL;
+        $test .= "// Si \$_POST['$name'] existe " . PHP_EOL;
+        $test .= "if(isset(\$_POST['$name'])){" . PHP_EOL. PHP_EOL. PHP_EOL;
+
         if (is_null($filtre)) $filtre = 'FILTER_SANITIZE_ADD_SLASHES';
         if ($encaps_b64) {
-            $test = "\$recolte['$name'] = base64_encode(filter_var(\$_POST['$name'],$filtre));" . PHP_EOL;
+            $test .=
+                "\$filtre_base_64 = filter_var(\$_POST['$name'],$filtre);" . PHP_EOL .
+                "\$recolte['$name']['resultat'] = (\$filtre_base_64 !== false ? base64_encode(\$filtre_base_64) : false);" . PHP_EOL;
         } else {
-            $test = "\$recolte['$name'] = filter_var(\$_POST['$name'],$filtre);" . PHP_EOL;
+            $test .= "\$recolte['$name']['resultat'] = filter_var(\$_POST['$name'],$filtre);" . PHP_EOL;
         }
 
-        return ["<textarea$gen_id_class_name>", $test, 'name' => $name];
-    }
-
-    /**
-     * @param $fonction
-     * @return static
-     */
-    #[Pure] private static function queue($fonction): static
-    {
-        return new static($fonction);
+        return ["<textarea$gen_id_class_name >", $test, 'name' => $name];
     }
 
     /**
@@ -174,6 +181,29 @@ class Modules_formulaire_textarea
         );
     }
 
+    /**
+     * @param $fonction
+     * @return static
+     */
+    #[Pure] private static function queue($fonction): static
+    {
+        return new static($fonction);
+    }
+
+    /**
+     * @return array
+     */
+    public function finaliser(): array
+    {
+        $this->preparation[0] .= '</textarea>';
+        return [
+            $this->preparation[0],
+            $this->preparation[1] .
+            '}' . PHP_EOL . '/* ISSET FIN -------------------- */' . PHP_EOL,
+            'textarea',
+            $this->preparation['name']
+        ];
+    }
 
     /**
      * @param $texte
@@ -188,19 +218,6 @@ class Modules_formulaire_textarea
         $test = $preparation[1];
 
         return ["$preparation[0]$texte", $test, 'name' => $preparation['name']];
-    }
-
-
-    /**
-     * @return array
-     */
-    public function finaliser(): array
-    {
-        $this->preparation[0] .= '</textarea>';
-        return [
-            $this->preparation[0],
-            $this->preparation[1]
-        ];
     }
 
 }
