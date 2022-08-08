@@ -126,7 +126,9 @@ class Modules_formulaire
         string|null $chemin_fichier_php = null,
         bool        $instancier = false,
         bool        $debug = false,
-        bool $exploiter = false
+        bool $exploiter = false,
+        bool $un_fichier_unique = true,
+
     ): array
     {
         $this->code[0] .= PHP_EOL . '</form>';
@@ -137,7 +139,8 @@ class Modules_formulaire
             $debug,
             $this->code[0],
             $chemin_fichier_php,
-            $exploiter
+            $exploiter,
+            $un_fichier_unique
         );
 
         return [
@@ -154,7 +157,8 @@ class Modules_formulaire
         $debug,
         $code,
         $chemin_fichier_php,
-        $utiliser
+        $utiliser,
+        $un_fichier_unique
     ): string
     {
         $auto_code_gen = '';
@@ -287,13 +291,16 @@ class Modules_formulaire
 
         TETE_CLASS;
 
-
-        if (!is_null($chemin_fichier_php)) {
+        if ($un_fichier_unique) {
             //<!-- [HTML_GEN] -->
-            $tete_class2 = str_replace('<!-- [HTML_GEN] -->',
+            $tete_class = str_replace('<!-- [HTML_GEN] -->',
                 str_replace("'", "\'", $code),
                 $tete_class);
-            file_put_contents($chemin_fichier_php, $tete_class2);
+        }
+
+        if (!is_null($chemin_fichier_php)) {
+
+            file_put_contents($chemin_fichier_php, $tete_class);
 
             if ($utiliser) {
                include $chemin_fichier_php;
