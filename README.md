@@ -1,6 +1,43 @@
 # GenForm
 generateur de formulaire
 
+quand ```->generer()``` est activé le tableau produit sera 
+en clée [0] le code html 
+et clée [1] le code php
+
+mais attention le constructeur est ainsi 
+si $_GET[r] comporte la valeur 1
+il execute l'analyse
+sinon il affichera le formulaire HTML
+
+donc ```->generer( instancier: true ) ``` ajoutera ``` \$recolte = new recolte();``` et declenchera 
+ce qui est expliqué.
+pareil si manuellement vous instancier ``` \$recolte = new recolte();``` et que vous desirez faire les choses
+sans automatisation vous devez 
+
+instancier ainsi : ``` \$recolte = new recolte(true);```
+
+```php
+                    /**
+                     * constructeur de la class recolte
+                     */
+                    public function __construct(\$auto = false) {
+                    
+                        if(!\$auto) {
+                            if(isset(\$_GET['r']) && \$_GET['r'] === '1'){
+                                \$this->_recolte = \$this->donnee();
+                                echo \$this->analyse(true);
+                            } else {
+                                 echo self::HTML;
+                            }
+                        }
+                        else {
+                            \$this->_recolte = \$this->donnee();
+                        }
+
+                    }
+```
+
 ----------------------
 E X E M P L E   I
 
@@ -167,10 +204,10 @@ E X E M P L E   V
                 INPUT::defini(type: 'submit')->finaliser()
             )
             ->generer(
-                chemin_fichier_php: FORMULAIRES . 'formulaire_test.php',
-                instancier: true,
-                debug: false,
-                exploiter: true
+                chemin_fichier_php: FORMULAIRES . 'formulaire_test.php', // chemin qui indique là ou le fichier genrer sera écrit
+                instancier: true, // ajoute en dessous de la class $recolte = new recolte();
+                debug: false, // si instancier est activer ajoute : var_dump($recolte->analyse());
+                exploiter: true // fait un include du fichier de chemin_fichier_php
             );
 ```
 ![image](https://user-images.githubusercontent.com/9467611/182428360-05864f90-f9f8-4797-a251-d100db134410.png)
