@@ -210,7 +210,8 @@ E X E M P L E   V
                 chemin_fichier_php: FORMULAIRES . 'formulaire_test.php', // chemin qui indique là ou le fichier sera genrer
                 instancier: true, // ajoute en dessous de la class $recolte = new recolte();
                 debug: false, // si instancier est activer ajoute : var_dump($recolte->analyse());
-                exploiter: true // fait un include du fichier de chemin_fichier_php
+                exploiter: true, // fait un include du fichier de chemin_fichier_php
+                un_fichier_unique: true // permet d'éviter d'ajoute le html dans la class produite
             );
 ```
 ![image](https://user-images.githubusercontent.com/9467611/182428360-05864f90-f9f8-4797-a251-d100db134410.png)
