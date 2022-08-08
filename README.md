@@ -2,17 +2,20 @@
 generateur de formulaire
 
 quand ```->generer()``` est activé le tableau produit sera 
-en clée [0] le code html 
-et clée [1] le code php
 
-mais attention le constructeur est ainsi 
-si $_GET[r] comporte la valeur 1
-il execute l'analyse
-sinon il affichera le formulaire HTML
+- en clée [0] le code html 
+- et clée [1] le code php
 
-donc ```->generer( instancier: true ) ``` ajoutera ``` \$recolte = new recolte();``` et declenchera 
+donc pas d'option activé dans ```->generer()``` donnera un tableau
+
+mais attention le constructeur est ainsi  ```->generer( instancier: true ) ```
+- et si $_GET[r] comporte la valeur 1
+- il va executer l'analyse
+- sinon il affichera le formulaire HTML
+
+- donc ```->generer( instancier: true ) ``` ajoutera ``` \$recolte = new recolte();``` et declenchera 
 ce qui est expliqué.
-pareil si manuellement vous instancier ``` \$recolte = new recolte();``` et que vous desirez faire les choses
+- pareil si manuellement vous instancier ``` \$recolte = new recolte();``` et que vous desirez faire les choses
 sans automatisation vous devez 
 
 instancier ainsi : ``` \$recolte = new recolte(true);```
