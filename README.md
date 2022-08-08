@@ -4,6 +4,7 @@ generateur de formulaire
 ----------------------
 E X E M P L E   I
 
+```php
         use Modules_formulaire_input as INPUT;
         use Modules_formulaire as FORMULAIRE;
         var_dump(
@@ -25,9 +26,11 @@ E X E M P L E   I
                 )
                 ->generer()
         );
+```        
 ----------------------
 E X E M P L E   II
 
+```php
         var_dump(
 
             SELECT::defini(
@@ -43,10 +46,11 @@ E X E M P L E   II
                 ->finaliser()
 
         );
-
+```
 ----------------------
 E X E M P L E   III
 
+```php
         var_dump(
 
             TEXTAREA::defini(
@@ -61,10 +65,11 @@ E X E M P L E   III
                 ->finaliser()
 
         );
-
+```
 ----------------------
 E X E M P L E   IV
 
+```php
         var_dump(
             FORMULAIRE::defini('formulaire_test')
                 ->elements(
@@ -98,8 +103,75 @@ E X E M P L E   IV
                 ->generer()
 
         );
+```
+----------------------
+E X E M P L E   V
 
+```php
+       FORMULAIRE::defini(SITE_WEB . 'formulaires.php?f=formulaire_test&r=1')
+            ->elements(
 
+                TEXTAREA::defini(
+                    id: 'id_input_2',
+                    class: 'classtest i121 l3 o1 ',
+                    name: 'nametest1',
+                    filtre: 'FILTER_SANITIZE_ADD_SLASHES|FILTER_SANITIZE_ENCODED',
+                    encaps_b64: true
+                )
+                    ->contenu('texte1 bla bla bla bla1 \\')
+                    ->contenu('texte2 bla bla bla bla2 à l\'ecole')
+                    ->finaliser()
+                ,
 
+                INPUT::defini(
+                    type: 'email',
+                    id: 'idtest',
+                    class: 'classtest i120 l2 o18 ',
+                    name: 'nametest'
+                )
+                    ->argument('maxlength', 10)
+                    ->argument('minlength', 2, maxmin_test: true)
+                    ->argument('size', 10)
+                    ->exception('step', 10)
+                    ->exception('data-tableau', '1,2,3')
+                    ->finaliser()
+                ,
+                INPUT::defini(
+                    type: 'file',
+                    option: '[
+                             ./upload,
+                             2000000,
+                             "jpg" => "image/jpeg",
+                             "png" => "image/png",
+                             "gif" => "image/gif"
+                             ]',
+                    id: 'id_input_2',
+                    class: 'classtest i121 l3 o1 ',
+                    name: 'nametest2'
+                )
+                    ->finaliser()
+
+                ,
+                SELECT::defini(
+                    id: 'id_input_2',
+                    class: 'classtest i121 l3 o1 ',
+                    name: 'nametest3',
+                    autofocus: true,
+                    multiple: true,
+                    required: true,
+                )
+                    ->option('chien', 'dog')
+                    ->option('chat', 'cat')
+                    ->finaliser()
+                ,
+                INPUT::defini(type: 'submit')->finaliser()
+            )
+            ->generer(
+                chemin_fichier_php: FORMULAIRES . 'formulaire_test.php',
+                instancier: true,
+                debug: false,
+                exploiter: true
+            );
+```
 ![image](https://user-images.githubusercontent.com/9467611/182428360-05864f90-f9f8-4797-a251-d100db134410.png)
 
