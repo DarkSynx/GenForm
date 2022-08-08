@@ -207,7 +207,7 @@ E X E M P L E   V
                 INPUT::defini(type: 'submit')->finaliser()
             )
             ->generer(
-                chemin_fichier_php: FORMULAIRES . 'formulaire_test.php', // chemin qui indique là ou le fichier genrer sera écrit
+                chemin_fichier_php: FORMULAIRES . 'formulaire_test.php', // chemin qui indique là ou le fichier sera genrer
                 instancier: true, // ajoute en dessous de la class $recolte = new recolte();
                 debug: false, // si instancier est activer ajoute : var_dump($recolte->analyse());
                 exploiter: true // fait un include du fichier de chemin_fichier_php
