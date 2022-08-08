@@ -197,13 +197,18 @@ class Modules_formulaire
                     /**
                      * constructeur de la class recolte
                      */
-                    public function __construct() {
+                    public function __construct(\$auto = false) {
                     
-                        if(isset(\$_GET['r']) && \$_GET['r'] === '1'){
+                        if(!\$auto) {
+                            if(isset(\$_GET['r']) && \$_GET['r'] === '1'){
+                                \$this->_recolte = \$this->donnee();
+                                echo \$this->analyse(true);
+                            } else {
+                                 echo self::HTML;
+                            }
+                        }
+                        else {
                             \$this->_recolte = \$this->donnee();
-                            echo \$this->analyse(true);
-                        } else {
-                             echo self::HTML;
                         }
 
                     }
