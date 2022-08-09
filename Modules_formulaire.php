@@ -20,7 +20,7 @@ class Modules_formulaire
 
     private string|null $_nom_formulaire = null;
 
-    private const CHEMIN_PATRON = SOUSMODULES;
+    private const CHEMIN_PATRON = './';
 
     /**
      * @param $code
