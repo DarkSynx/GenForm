@@ -16,13 +16,44 @@ class recolte
      */
     private array $_recolte = array();
 
-
     /**
      * variable qui va recevoir le tableau de recolte
      * @var array
      */
     public const HTML =
         '<!-- [HTML_GEN] -->';
+
+    private const SCRIPT_JS = '
+    <script>
+    if("<!-- [JS_ACTIVATION] -->" === "1"){
+        const type = ["<!-- [JS_GEN_TYPE] -->"];
+        const name = ["<!-- [JS_GEN_NAME] -->"];
+        const value = ["<!-- [JS_GEN_VALUE] -->"];
+        
+        if(
+            (type[0] !== \'<!-- [JS_GEN_TYPE] -->\' && type[0] !== "") &&
+            (name[0] !== \'<!-- [JS_GEN_NAME] -->\' && name[0] !== "") &&
+            (value[0] !== \'<!-- [JS_GEN_VALUE] -->\' && value[0] !== "")
+        )
+        {
+         
+            for (let i = 0; i < name.length; i++) {
+              let element = document.getElementsByName(name[i]);
+             // console.log(element);
+                switch(type[i]){
+                    case \'select\':
+                    case \'input\':
+                         element.value = value[i];
+                         element[0].setAttribute("value",value[i]);
+                   break;
+                   case \'textarea\':
+                        element.innerText = value[i];    
+                   break;
+                }
+            }
+        }
+    }
+    </script>';
 
     /**
      * constructeur de la class recolte
@@ -33,9 +64,13 @@ class recolte
         if (!$auto) {
             if (isset($_GET['r']) && $_GET['r'] === '1') {
                 $this->_recolte = $this->donnee();
-                echo $this->analyse(true);
+
+                echo self::HTML . $this->injection_de_valeur();
+               // var_dump($this->analyse());
+
             } else {
-                echo self::HTML;
+
+                echo self::HTML . $this->injection_de_valeur();
             }
         } else {
             $this->_recolte = $this->donnee();
@@ -43,10 +78,46 @@ class recolte
 
     }
 
+    private function injection_de_valeur()
+    {
+        $gen_script = '';
+
+        if (isset($_SESSION['filter']) && $_SESSION['filter'] == 'ok') {
+
+            $tableau_post_name = ["<!-- [POST_NAME_EXIST] -->"];
+            $tableau_valeur_generer = array();
+
+            if ($tableau_post_name !== ['<!-- [POST_NAME_EXIST] -->']) {
+                var_dump($_POST);
+                foreach ($tableau_post_name as $clee) {
+                    if (isset($_POST[$clee]))
+                        $tableau_valeur_generer[$clee] = $_POST[$clee];
+                }
+                //var_dump($tableau_valeur_generer);
+
+                $gen_script = str_replace(
+                    [
+                        '"<!-- [JS_GEN_VALUE] -->"',
+                        '"<!-- [JS_ACTIVATION] -->"'
+                    ],
+                    [
+                        '"' . implode('","', array_values($tableau_valeur_generer)) . '"',
+                        '"1"'
+                    ],
+                    self::SCRIPT_JS);
+
+            }
+        }
+        return $gen_script;
+    }
+
+
     private function donnee(): array
     {
         $recolte = array();
-       /* <!-- [DONNEE] --> */
+        /* <!-- [DONNEE] --> */
+
+        $_SESSION['filter'] = 'ok';
         return $recolte;
     }
 
@@ -114,4 +185,4 @@ class recolte
         return $tableau_final;
     }
 }
-/* =-=-=-=-=-=-=-=-=  F   I   N : C L A S S : R E C O L T E =-=-=-=-=-=-=-= */
+/* =-=-=-=-=-=-=-=-=  ! F   I   N : C L A S S : R E C O L T E ! =-=-=-=-=-=-=-= */

@@ -20,13 +20,18 @@ class Modules_formulaire
 
     private string|null $_nom_formulaire = null;
 
-    private const CHEMIN_PATRON = './';
+    private const CHEMIN_PATRON = SOUSMODULES;
+
+    private array $_tab_nom_type_valeur = array();
 
     /**
      * @param $code
      */
-    public function __construct($code)
+    public function __construct(array $tableau)
     {
+        $code = $tableau[0];
+        $this->_element_check_name = $tableau[1];
+
         $this->code = $code;
 
         //var_dump($this->_nom_formulaire);
@@ -47,7 +52,7 @@ class Modules_formulaire
     public static function defini(string|null $action = null, string $method = 'post', string|null $id = null,
                                   string|null $class = null, string|null $name = null): static
     {
-        return new static(self::identite_formulaire($action, $method, $id, $class, $name));
+        return new static([self::identite_formulaire($action, $method, $id, $class, $name), array()]);
     }
 
     /**
@@ -78,17 +83,19 @@ class Modules_formulaire
      */
     public function elements(...$tableau): static
     {
+        $tableau_element = array();
         $tableau_fusionner = [$this->code[0], $this->code[1]];
         foreach ($tableau as $valeur) {
             $tableau_element = call_user_func_array([$this, 'element'], [$valeur]);
             $tableau_fusionner = [
-                $tableau_fusionner[0] . PHP_EOL . $tableau_element[0],
-                $tableau_fusionner[1] . PHP_EOL . $tableau_element[1],
+                $tableau_fusionner[0] . PHP_EOL . $tableau_element[0][0],
+                $tableau_fusionner[1] . PHP_EOL . $tableau_element[0][1],
             ];
         }
         $tableau_fusionner['name'] = $this->_nom_formulaire;
+        //$tableau_fusionner['donnee'] = array();
 
-        return new static($tableau_fusionner);
+        return new static([$tableau_fusionner, $tableau_element[1]]);
     }
 
 
@@ -104,10 +111,13 @@ class Modules_formulaire
             throw new Exception("( Erreur [$tableau[2] : $tableau[3]] nom déjà utilisé par [$element : $tableau[3]] )");
         }
 
-        $this->_element_check_name[$tableau[3]] = $tableau[2];
+        if (!empty($tableau[3]))
+            $this->_element_check_name[$tableau[3]] = $tableau[2];
 
+        //$this->_tab_nom_type_valeur[$tableau[]]
+        //var_dump($this->_element_check_name);
 
-        return $tableau;
+        return [$tableau, $this->_element_check_name];
     }
 
     /* *
@@ -133,6 +143,8 @@ class Modules_formulaire
 
     ): array
     {
+        //var_dump($this->_element_check_name);
+
         $this->code[0] .= PHP_EOL . '</form>';
 
         $donnee_php = $this->gen_class_exploite(
@@ -165,6 +177,7 @@ class Modules_formulaire
     {
         $auto_code_gen = '';
 
+
         if ($instancier) {
             $vardump = '';
             if ($debug) $vardump = 'var_dump($recolte->analyse());';
@@ -173,9 +186,21 @@ class Modules_formulaire
                 $vardump";
         }
 
+        //var_dump($this->_element_check_name);
 
         $patron_class_recup = file_get_contents(self::CHEMIN_PATRON . 'patron_class_recolte.php');
         $patron_class_recup = str_replace('/* <!-- [DONNEE] --> */', $donnee, $patron_class_recup);
+
+        $patron_class_recup = str_replace(
+            ['"<!-- [JS_GEN_NAME] -->"', '"<!-- [POST_NAME_EXIST] -->"'],
+            '"' . implode('","', array_keys($this->_element_check_name)) . '"',
+            $patron_class_recup);
+
+        $patron_class_recup = str_replace(
+            '"<!-- [JS_GEN_TYPE] -->"',
+            '"' . implode('","', array_values($this->_element_check_name)) . '"',
+            $patron_class_recup);
+
         $patron_class_recup .= $auto_code_gen;
 
 
