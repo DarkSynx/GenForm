@@ -16,12 +16,29 @@ class Modules_formulaire
      */
     private array $code;
 
+    /**
+     *
+     */
+    private const VERSION = '1.0.1a';
+
+    /**
+     * @var array|mixed
+     */
     private array $_element_check_name = array();
 
+    /**
+     * @var string|mixed|null
+     */
     private string|null $_nom_formulaire = null;
 
+    /**
+     *
+     */
     private const CHEMIN_PATRON = SOUSMODULES;
 
+    /**
+     * @var array
+     */
     private array $_tab_nom_type_valeur = array();
 
     /**
@@ -166,6 +183,17 @@ class Modules_formulaire
     }
 
 
+    /**
+     * @param $donnee
+     * @param $instancier
+     * @param $debug
+     * @param $code
+     * @param $chemin_fichier_php
+     * @param $utiliser
+     * @param $un_fichier_unique
+     * @param $post_traitement
+     * @return string
+     */
     private function gen_class_exploite(
         $donnee,
         $instancier,

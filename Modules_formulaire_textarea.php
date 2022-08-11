@@ -5,6 +5,9 @@ namespace Eukaruon\modules;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 
+/**
+ *
+ */
 class Modules_formulaire_textarea
 {
     /**
