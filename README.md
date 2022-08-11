@@ -2,7 +2,7 @@
 generateur de formulaire
 
 
-dans Modules_formulaire ne pas oublier de définir ou se trouve le ```patron_class_recolte.php```*
+dans Modules_formulaire en début de class ne pas oublier de définir ```private const CHEMIN_PATRON =``` ou se trouve le ```patron_class_recolte.php```
 moi j'ai définit par défault le chemin : via la constante ```SOUSMODULES``` 
 mais vous pouvez y mettre un autre chemin de dossier ou ```./```
 
