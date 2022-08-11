@@ -1,45 +1,6 @@
 # GenForm
 generateur de formulaire
 
-quand ```->generer()``` est activé le tableau produit sera 
-
-- en clée [0] le code html 
-- et clée [1] le code php
-
-donc pas d'option activé dans ```->generer()``` donnera un tableau
-
-mais attention le constructeur est ainsi  ```->generer( instancier: true ) ```
-- et si $_GET[r] comporte la valeur 1
-- il va executer l'analyse
-- sinon il affichera le formulaire HTML
-
-- donc ```->generer( instancier: true ) ``` ajoutera ``` \$recolte = new recolte();``` et declenchera 
-ce qui est expliqué.
-- pareil si manuellement vous instancier ``` \$recolte = new recolte();``` et que vous desirez faire les choses
-sans automatisation vous devez 
-
-instancier ainsi : ``` \$recolte = new recolte(true);```
-
-```php
-                    /**
-                     * constructeur de la class recolte
-                     */
-                    public function __construct(\$auto = false) {
-                    
-                        if(!\$auto) {
-                            if(isset(\$_GET['r']) && \$_GET['r'] === '1'){
-                                \$this->_recolte = \$this->donnee();
-                                echo \$this->analyse(true);
-                            } else {
-                                 echo self::HTML;
-                            }
-                        }
-                        else {
-                            \$this->_recolte = \$this->donnee();
-                        }
-
-                    }
-```
 
 ----------------------
 E X E M P L E   I
