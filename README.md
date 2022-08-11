@@ -22,7 +22,8 @@ pour produire un fichier unique contenant le formulaire et la validation de celu
                 instancier: true, // ajoute en dessous de la class $recolte = new recolte();
                 debug: false, // si instancier est activer ajoute : var_dump($recolte->analyse());
                 exploiter: true, // fait un include du fichier de chemin_fichier_php
-                un_fichier_unique: true // permet d'éviter d'ajoute le html dans la class produite
+                un_fichier_unique: true, // permet d'éviter d'ajoute le html dans la class produite
+                fichier_post_traitement: 'index.php' // permet d'indiquer votre fichier qui va traité la suite aprés validation
             );
 ```
 
