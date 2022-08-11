@@ -20,7 +20,7 @@ class Modules_formulaire
 
     private string|null $_nom_formulaire = null;
 
-    private const CHEMIN_PATRON = './';
+    private const CHEMIN_PATRON = SOUSMODULES;
 
     private array $_tab_nom_type_valeur = array();
 

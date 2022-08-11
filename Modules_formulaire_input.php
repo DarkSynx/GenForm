@@ -356,15 +356,7 @@ class Modules_formulaire_input
      * @var mixed
      */
     protected mixed $preparation;
-    /**
-     * @var mixed
-     */
-    protected string $name;
 
-    /**
-     * @var mixed
-     */
-    protected string $type;
 
     /**
      * @param array $type
@@ -373,8 +365,8 @@ class Modules_formulaire_input
     {
         $this->preparation = $type;
 
-        if (isset($type['name']))
-            $this->name = $type['name'];
+        /*if (isset($type['name']))
+            $this->name = $type['name'];*/
 
     }
 
@@ -428,14 +420,13 @@ class Modules_formulaire_input
         
         TEST;
 
-        if($type == 'file') {
-            $test .= "/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */" . PHP_EOL;
+        $test .= "/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */" . PHP_EOL;
+        if ($type == 'file') {
             $test .= "// Si \$_FILE['$name'] existe " . PHP_EOL;
-            $test .= "if(isset(\$_FILE['$name'])){" . PHP_EOL. PHP_EOL. PHP_EOL;
+            $test .= "if(isset(\$_FILE['$name'])){" . PHP_EOL . PHP_EOL . PHP_EOL;
         } else {
-            $test .= "/* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ */" . PHP_EOL;
             $test .= "// Si \$_POST['$name'] existe " . PHP_EOL;
-            $test .= "if(isset(\$_POST['$name'])){" . PHP_EOL. PHP_EOL. PHP_EOL;
+            $test .= "if(isset(\$_POST['$name'])){" . PHP_EOL . PHP_EOL . PHP_EOL;
         }
 
 
@@ -477,30 +468,21 @@ class Modules_formulaire_input
             $test .= "// analyse de \$_POST['$name'] " . PHP_EOL;
             $test .= "\$recolte['$name']['avant'] = strlen(\$_POST['$name']);" . PHP_EOL;
             $test .= "// nettoyage de \$_POST['$name'] " . PHP_EOL . PHP_EOL;
-            switch ($nettoyage_action) {
-                case self::FONCTION_PHPFILTER : // indique une fonction filtre de php à utilisé
-                    $test .= "\$_POST['$name'] = filter_var(\$_POST['$name'], $nettoyage_filtre);" . PHP_EOL;
-                    break;
-                case self::FONCTION_PHP : // indique une fonction php à utilisé
-                    $test .= "\$_POST['$name'] = $nettoyage_filtre(\$_POST['$name']);" . PHP_EOL;
-                    break;
-                case self::FONCTION_CLASS : // indique que c'est une fonction de cette class si
-                    $test .= self::$nettoyage_filtre($name) . PHP_EOL;
-                    break;
-                case self::FONCTION_PREGREPLACE : // indique que c'est un filtre preg_replace
-                    $test .= "\$_POST['$name'] = preg_replace('$nettoyage_filtre', '', \$_POST['$name']);" . PHP_EOL;
-                    break;
-                default:
-                    throw new Exception(
-                        'Erreur dans le tableau de type une valeur ' .
-                        'dans la constante TYPE[nettoyage][1] est detecter : [' .
-                        $nettoyage_action . '] inconnu !');
-            }
+            $test .= match ($nettoyage_action) {
+                self::FONCTION_PHPFILTER => "\$_POST['$name'] = filter_var(\$_POST['$name'], $nettoyage_filtre);" . PHP_EOL,
+                self::FONCTION_PHP => "\$_POST['$name'] = $nettoyage_filtre(\$_POST['$name']);" . PHP_EOL,
+                self::FONCTION_CLASS => self::$nettoyage_filtre($name) . PHP_EOL,
+                self::FONCTION_PREGREPLACE => "\$_POST['$name'] = preg_replace('$nettoyage_filtre', '', \$_POST['$name']);" . PHP_EOL,
+                default => throw new Exception(
+                    'Erreur dans le tableau de type une valeur ' .
+                    'dans la constante TYPE[nettoyage][1] est detecter : [' .
+                    $nettoyage_action . '] inconnu !'),
+            };
             $test .= PHP_EOL . "// fin analyse de \$_POST['$name'] " . PHP_EOL;
             $test .= "\$recolte['$name']['apres'] = strlen(\$_POST['$name']);" . PHP_EOL;
             $test .= "\$recolte['$name']['modification'] = (\$recolte['$name']['apres'] == \$recolte['$name']['avant']);" . PHP_EOL;
 
-           // $test .= "\$recolte['$name']['valeur'] = &\$_POST['$name'];" . PHP_EOL;
+            // $test .= "\$recolte['$name']['valeur'] = &\$_POST['$name'];" . PHP_EOL;
 
         }
         return $test;
@@ -527,25 +509,16 @@ class Modules_formulaire_input
 
             $test .= "// validation de \$_POST['$name'] " . PHP_EOL;
 
-            switch ($validation_action) {
-                case self::FONCTION_PHPFILTER : // indique une fonction filtre de php à utilisé
-                    $test .= "\$recolte['$name']['resultat'] = filter_var(\$_POST['$name'], $validation_filtre);" . PHP_EOL;
-                    break;
-                case self::FONCTION_PHP : // indique une fonction php à utilisé
-                    $test .= "\$recolte['$name']['resultat'] = $validation_filtre(\$_POST['$name']);" . PHP_EOL;
-                    break;
-                case self::FONCTION_CLASS : // indique que c'est une fonction de cette class si
-                    $test .= self::$validation_filtre($name, false, $mode) . PHP_EOL;
-                    break;
-                case self::FONCTION_PREGMATCH : // indique que c'est un filtre preg_match
-                    $test .= "\$recolte['$name']['resultat'] = preg_match('$validation_filtre', '', \$_POST['$name']);" . PHP_EOL;
-                    break;
-                default:
-                    throw new Exception(
-                        'Erreur dans le tableau de type une valeur ' .
-                        'dans la constante TYPE[validation][1] est detecter : [' .
-                        $validation_action . '] inconnu !');
-            }
+            $test .= match ($validation_action) {
+                self::FONCTION_PHPFILTER => "\$recolte['$name']['resultat'] = filter_var(\$_POST['$name'], $validation_filtre);" . PHP_EOL,
+                self::FONCTION_PHP => "\$recolte['$name']['resultat'] = $validation_filtre(\$_POST['$name']);" . PHP_EOL,
+                self::FONCTION_CLASS => self::$validation_filtre($name, false, $mode) . PHP_EOL,
+                self::FONCTION_PREGMATCH => "\$recolte['$name']['resultat'] = preg_match('$validation_filtre', '', \$_POST['$name']);" . PHP_EOL,
+                default => throw new Exception(
+                    'Erreur dans le tableau de type une valeur ' .
+                    'dans la constante TYPE[validation][1] est detecter : [' .
+                    $validation_action . '] inconnu !'),
+            };
 
         }
         return $test;
@@ -725,8 +698,9 @@ class Modules_formulaire_input
                     $this->preparation[2] .= $test; // test lier à data-
                 }
             }
+
             return static::queue(
-                ["{$this->preparation[0]} $nom=\"$valeur\"", $this->preparation[1], $this->preparation[2], 'name' => $this->name]
+                ["{$this->preparation[0]} $nom=\"$valeur\"", $this->preparation[1], $this->preparation[2], 'name' => $this->preparation['name']]
             );
         }
         throw new Exception(
@@ -905,7 +879,7 @@ class Modules_formulaire_input
         }
         /* F - I - N :: :: :: :: :: :: :: :: :: :: :: :: :: :: :: :: :: :: :: :: :: :: :: ::  */
 
-        return ["{$preparation[0]} $argument=\"$valeur\"", $preparation[1], $test, 'name' => $preparation['name']];
+        return ["$preparation[0] $argument=\"$valeur\"", $preparation[1], $test, 'name' => $preparation['name']];
     }
 
     /**

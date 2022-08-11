@@ -88,7 +88,7 @@ class recolte
             $tableau_valeur_generer = array();
 
             if ($tableau_post_name !== ['<!-- [POST_NAME_EXIST] -->']) {
-                var_dump($_POST);
+                //var_dump($_POST);
                 foreach ($tableau_post_name as $clee) {
                     if (isset($_POST[$clee]))
                         $tableau_valeur_generer[$clee] = $_POST[$clee];
@@ -105,7 +105,6 @@ class recolte
                         '"1"'
                     ],
                     self::SCRIPT_JS);
-
             }
         }
         return $gen_script;
@@ -115,6 +114,7 @@ class recolte
     private function donnee(): array
     {
         $recolte = array();
+
         /* <!-- [DONNEE] --> */
 
         $_SESSION['filter'] = 'ok';

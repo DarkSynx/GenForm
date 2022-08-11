@@ -12,10 +12,6 @@ class Modules_formulaire_textarea
      */
     protected mixed $preparation;
 
-    /**
-     * @var mixed
-     */
-    protected string $name;
 
     /**
      * @param $value
@@ -24,8 +20,7 @@ class Modules_formulaire_textarea
     {
         $this->preparation = $value;
 
-        if (isset($type['name']))
-            $this->name = $type['name'];
+
     }
 
     /**
@@ -213,10 +208,7 @@ class Modules_formulaire_textarea
     #[ArrayShape([0 => "string", 1 => "string", 'name' => "mixed"])]
     private function element($texte, $preparation): array
     {
-        $this->name = $preparation['name'];
-
         $test = $preparation[1];
-
         return ["$preparation[0]$texte", $test, 'name' => $preparation['name']];
     }
 
