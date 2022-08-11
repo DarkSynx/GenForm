@@ -6,6 +6,26 @@ dans Modules_formulaire en début de class ne pas oublier de définir ```private
 moi j'ai définit par défault le chemin : via la constante ```SOUSMODULES``` 
 mais vous pouvez y mettre un autre chemin de dossier ou ```./```
 
+je vous conseil en fin de formulaire de bien configurer ```->generer(...)``` 
+pour produire un fichier unique contenant le formulaire et la validation de celui voici la cofiguration requise:
+
+```php
+        // ?r=1 informe la class d'activer l'analyse quand vous cliquez sur envoyer
+       FORMULAIRE::defini( CHEMIN_WEB_DU_FORMULAIRE . 'formulaires.php?r=1' ) 
+            ->elements(
+            ...
+            ,
+            ...
+            )
+            ->generer(
+                chemin_fichier_php: FORMULAIRES . 'formulaire_test.php', // chemin qui indique là ou le fichier sera genrer
+                instancier: true, // ajoute en dessous de la class $recolte = new recolte();
+                debug: false, // si instancier est activer ajoute : var_dump($recolte->analyse());
+                exploiter: true, // fait un include du fichier de chemin_fichier_php
+                un_fichier_unique: true // permet d'éviter d'ajoute le html dans la class produite
+            );
+```
+
 ----------------------
 E X E M P L E   I
 
