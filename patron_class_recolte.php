@@ -65,11 +65,24 @@ class recolte
             if (isset($_GET['r']) && $_GET['r'] === '1') {
                 $this->_recolte = $this->donnee();
 
-                echo self::HTML . $this->injection_de_valeur();
-               // var_dump($this->analyse());
+                $analyse = $this->analyse();
+                // var_dump($analyse);
+                $message_erreur = '';
+                foreach ($analyse['Erreurs'] as $clee => $valeur){
+                    $message_erreur .= '- Erreur : ' . $valeur['type'] . '<br>';
+                }
+
+               if($analyse['Resultat'] === false){
+                   echo "<p id=\"genformerror\">$message_erreur</p>" . self::HTML . $this->injection_de_valeur();
+               }
+               else {
+                   $chargement_page_dexploitation = "<!-- [PHP-INJECTION-LIEN] -->";
+                   if($chargement_page_dexploitation !== '<!-- [PHP-INJECTION-LIEN] -->') {
+                       include $chargement_page_dexploitation;
+                   }
+               }
 
             } else {
-
                 echo self::HTML . $this->injection_de_valeur();
             }
         } else {
@@ -157,24 +170,24 @@ class recolte
      */
     public function analyse(bool $retour_json = false): array|string
     {
-        $tableau_final = ['resultat' => true, 'Erreurs' => array()];
+        $tableau_final = ['Resultat' => true, 'Erreurs' => array()];
         foreach ($this->_recolte as $clee => $valeur) {
             // vérifier [résultat]
-            if (isset($valeur['resultat']) && $valeur['resultat'] === false) {
-                if ($tableau_final['resultat']) $tableau_final['resultat'] = false;
-                $tableau_final['erreur'][$clee] = $this->_recolte[$clee];
+            if (isset($valeur['Resultat']) && $valeur['Resultat'] === false) {
+                if ($tableau_final['Resultat']) $tableau_final['Resultat'] = false;
+                $tableau_final['Erreurs'][$clee] = $this->_recolte[$clee];
             }
 
             // vérifier [modification]
             if (isset($valeur['modification']) && $valeur['modification'] === false) {
-                if ($tableau_final['resultat']) $tableau_final['resultat'] = false;
-                $tableau_final['erreur'][$clee] = $this->_recolte[$clee];
+                if ($tableau_final['Resultat']) $tableau_final['Resultat'] = false;
+                $tableau_final['Erreurs'][$clee] = $this->_recolte[$clee];
             }
 
             // vérifier [test]
             if (isset($valeur['test']) && $valeur['test'] === false) {
-                if ($tableau_final['resultat']) $tableau_final['resultat'] = false;
-                $tableau_final['erreur'][$clee] = $this->_recolte[$clee];
+                if ($tableau_final['Resultat']) $tableau_final['Resultat'] = false;
+                $tableau_final['Erreurs'][$clee] = $this->_recolte[$clee];
             }
 
         }

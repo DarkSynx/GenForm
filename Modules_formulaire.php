@@ -136,11 +136,11 @@ class Modules_formulaire
      */
     public function generer(
         string|null $chemin_fichier_php = null,
+        string|null $fichier_post_traitement = null,
         bool        $instancier = false,
         bool        $debug = false,
         bool        $exploiter = false,
-        bool        $un_fichier_unique = true,
-
+        bool        $un_fichier_unique = true
     ): array
     {
         //var_dump($this->_element_check_name);
@@ -154,7 +154,8 @@ class Modules_formulaire
             $this->code[0],
             $chemin_fichier_php,
             $exploiter,
-            $un_fichier_unique
+            $un_fichier_unique,
+            $fichier_post_traitement
         );
 
         return [
@@ -172,7 +173,8 @@ class Modules_formulaire
         $code,
         $chemin_fichier_php,
         $utiliser,
-        $un_fichier_unique
+        $un_fichier_unique,
+        $post_traitement
     ): string
     {
         $auto_code_gen = '';
@@ -190,6 +192,14 @@ class Modules_formulaire
 
         $patron_class_recup = file_get_contents(self::CHEMIN_PATRON . 'patron_class_recolte.php');
         $patron_class_recup = str_replace('/* <!-- [DONNEE] --> */', $donnee, $patron_class_recup);
+
+
+        if (!is_null($post_traitement)) {
+            $patron_class_recup = str_replace(
+                '"<!-- [PHP-INJECTION-LIEN] -->"',
+                '\'' . $post_traitement. '\'',
+                $patron_class_recup);
+        }
 
         $patron_class_recup = str_replace(
             ['"<!-- [JS_GEN_NAME] -->"', '"<!-- [POST_NAME_EXIST] -->"'],
