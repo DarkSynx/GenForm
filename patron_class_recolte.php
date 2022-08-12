@@ -60,36 +60,51 @@ class recolte
      */
     public function __construct($auto = false)
     {
-
-        if (!$auto) {
-            if (isset($_GET['r']) && $_GET['r'] === '1') {
-                $this->_recolte = $this->donnee();
-
-                $analyse = $this->analyse();
-                // var_dump($analyse);
-                $message_erreur = '';
-                foreach ($analyse['Erreurs'] as $clee => $valeur){
-                    $message_erreur .= '- Erreur : ' . $valeur['type'] . '<br>';
-                }
-
-               if($analyse['Resultat'] === false){
-                   echo "<p id=\"genformerror\">$message_erreur</p>" . self::HTML . $this->injection_de_valeur();
-               }
-               else {
-                   $chargement_page_dexploitation = "<!-- [PHP-INJECTION-LIEN] -->";
-                   if($chargement_page_dexploitation !== '<!-- [PHP-INJECTION-LIEN] -->') {
-                       include $chargement_page_dexploitation;
-                   }
-               }
-
-            } else {
-                echo self::HTML . $this->injection_de_valeur();
-            }
+        $_option_identifiant = false;
+        $utiliser_un_identifiant = "<!-- [PHP-INJECTION-IDUSE-OK] -->";
+        if ($utiliser_un_identifiant == true &&
+            isset($_GET['u']) === true &&
+            $_GET['u'] !== '<!-- [PHP-INJECTION-IDUSE] -->' &&
+            $_GET['u'] === '"<!-- [PHP-INJECTION-IDUSE] -->"'
+        ) {
+            $_option_identifiant = true;
         } else {
-            $this->_recolte = $this->donnee();
+            if ($utiliser_un_identifiant === false) {
+                $_option_identifiant = true;
+            }
         }
 
+        if ($_option_identifiant === true) {
+            if (!$auto) {
+                if (isset($_GET['r']) && $_GET['r'] === '1') {
+                    $this->_recolte = $this->donnee();
+
+                    $analyse = $this->analyse();
+                    // var_dump($analyse);
+                    $message_erreur = '';
+                    foreach ($analyse['Erreurs'] as $clee => $valeur) {
+                        $message_erreur .= '- Erreur : ' . $valeur['type'] . '<br>';
+                    }
+
+                    if ($analyse['Resultat'] === false) {
+                        echo "<p id=\"genformerror\">$message_erreur</p>" . self::HTML . $this->injection_de_valeur();
+                    } else {
+                        $chargement_page_dexploitation = "<!-- [PHP-INJECTION-LIEN] -->";
+                        if ($chargement_page_dexploitation !== '<!-- [PHP-INJECTION-LIEN] -->') {
+                            include $chargement_page_dexploitation;
+                        }
+                    }
+
+                } else {
+                    echo self::HTML . $this->injection_de_valeur();
+                }
+            } else {
+                $this->_recolte = $this->donnee();
+            }
+
+        }
     }
+
 
     private function injection_de_valeur()
     {

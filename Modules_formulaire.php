@@ -19,7 +19,7 @@ class Modules_formulaire
     /**
      *
      */
-    private const VERSION = '1.0.1a';
+    private const VERSION = '1.0.2a';
 
     /**
      * @var array|mixed
@@ -154,10 +154,12 @@ class Modules_formulaire
     public function generer(
         string|null $chemin_fichier_php = null,
         string|null $fichier_post_traitement = null,
+        string|null $identifiant_utilitsation = null,
         bool        $instancier = false,
         bool        $debug = false,
         bool        $exploiter = false,
-        bool        $un_fichier_unique = true
+        bool        $un_fichier_unique = true,
+
     ): array
     {
         //var_dump($this->_element_check_name);
@@ -172,7 +174,8 @@ class Modules_formulaire
             $chemin_fichier_php,
             $exploiter,
             $un_fichier_unique,
-            $fichier_post_traitement
+            $fichier_post_traitement,
+            $identifiant_utilitsation
         );
 
         return [
@@ -189,7 +192,7 @@ class Modules_formulaire
      * @param $debug
      * @param $code
      * @param $chemin_fichier_php
-     * @param $utiliser
+     * @param $exploiter
      * @param $un_fichier_unique
      * @param $post_traitement
      * @return string
@@ -200,9 +203,10 @@ class Modules_formulaire
         $debug,
         $code,
         $chemin_fichier_php,
-        $utiliser,
+        $exploiter,
         $un_fichier_unique,
-        $post_traitement
+        $post_traitement,
+        $identifiant_utilitsation
     ): string
     {
         $auto_code_gen = '';
@@ -212,7 +216,7 @@ class Modules_formulaire
             $vardump = '';
             if ($debug) $vardump = 'var_dump($recolte->analyse());';
             $auto_code_gen = "
-                \$recolte = new recolte();
+                new recolte();
                 $vardump";
         }
 
@@ -221,6 +225,27 @@ class Modules_formulaire
         $patron_class_recup = file_get_contents(self::CHEMIN_PATRON . 'patron_class_recolte.php');
         $patron_class_recup = str_replace('/* <!-- [DONNEE] --> */', $donnee, $patron_class_recup);
 
+        if (!is_null($identifiant_utilitsation)) {
+            $patron_class_recup = str_replace(
+                '"<!-- [PHP-INJECTION-IDUSE-OK] -->"',
+                'true',
+                $patron_class_recup);
+
+            $patron_class_recup = str_replace(
+                '"<!-- [PHP-INJECTION-IDUSE] -->"',
+                $identifiant_utilitsation,
+                $patron_class_recup);
+        } else {
+            $patron_class_recup = str_replace(
+                '"<!-- [PHP-INJECTION-IDUSE-OK] -->"',
+                'false',
+                $patron_class_recup);
+
+            $patron_class_recup = str_replace(
+                '"<!-- [PHP-INJECTION-IDUSE] -->"',
+                 time() ,
+                $patron_class_recup);
+        }
 
         if (!is_null($post_traitement)) {
             $patron_class_recup = str_replace(
@@ -253,7 +278,7 @@ class Modules_formulaire
 
             file_put_contents($chemin_fichier_php, $patron_class_recup);
 
-            if ($utiliser) {
+            if ($exploiter) {
                 include $chemin_fichier_php;
             }
         }
