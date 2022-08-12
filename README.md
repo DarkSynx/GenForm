@@ -11,6 +11,8 @@ pour produire un fichier unique contenant le formulaire et la validation de celu
 
 ```php
         // ?r=1 informe la class d'activer l'analyse quand vous cliquez sur envoyer
+        // si vous avez identifiant_utilitsation d'utilisé vous devez appeler votre formulaire
+        // https://.../formulaire.php?u=0123456789 
        FORMULAIRE::defini( CHEMIN_WEB_DU_FORMULAIRE . 'formulaires.php?r=1' ) 
             ->elements(
             ...
@@ -23,7 +25,8 @@ pour produire un fichier unique contenant le formulaire et la validation de celu
                 debug: false, // si instancier est activer ajoute : var_dump($recolte->analyse());
                 exploiter: true, // fait un include du fichier de chemin_fichier_php
                 un_fichier_unique: true, // permet d'éviter d'ajoute le html dans la class produite
-                fichier_post_traitement: 'index.php' // permet d'indiquer votre fichier qui va traité la suite aprés validation
+                fichier_post_traitement: 'index.php', // permet d'indiquer votre fichier qui va traité la suite aprés validation
+                identifiant_utilitsation: '0123456789' // permet d'executé le formulaire via _GET u = identifiant
             );
 ```
 
